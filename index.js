@@ -28,6 +28,7 @@ async function run() {
     await client.connect();
 
     const userCollection = client.db("rhythmicDB").collection("users");
+    const classCollection = client.db("rhythmicDB").collection("classes");
 
   //Users
     app.post('/users', async (req, res) => {
@@ -40,6 +41,24 @@ async function run() {
       const result = await userCollection.insertOne(user);
       res.send(result);
     });
+
+    //Class
+    app.get('/top-classes', async(req, res) =>{
+      
+      const allClasses = await classCollection.find({}).toArray();
+      const topClasses = allClasses
+      .map(cls => ({
+        ...cls,
+        studentCount: cls.students
+      }))
+      .sort((a, b) => b.studentCount - a.studentCount)
+       .slice(0, 6);
+  
+      res.send(topClasses);
+  })
+  
+
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
