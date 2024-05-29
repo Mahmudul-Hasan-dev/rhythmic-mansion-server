@@ -29,6 +29,7 @@ async function run() {
 
     const userCollection = client.db("rhythmicDB").collection("users");
     const classCollection = client.db("rhythmicDB").collection("classes");
+    const instructorCollection = client.db("rhythmicDB").collection("instructors");
 
   //Users
     app.post('/users', async (req, res) => {
@@ -57,7 +58,11 @@ async function run() {
       res.send(topClasses);
   })
   
-
+//instructors
+app.get('/instructors', async(req, res) =>{
+  const result = await instructorCollection.find().toArray();
+  res.send(result);
+})
 
 
     // Send a ping to confirm a successful connection
