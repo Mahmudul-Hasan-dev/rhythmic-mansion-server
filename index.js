@@ -55,12 +55,16 @@ async function run() {
   })
 }
 
+// ======= Users collection ====/
 
-  //Users
+
+// show user
   app.get('/users', verifyToken,  async (req, res) => {
     const result = await userCollection.find().toArray();
     res.send(result);
   });
+
+  // save user
     app.post('/users', async (req, res) => {
       const user = req.body;
      const query = { email: user.email }
@@ -72,6 +76,7 @@ async function run() {
       res.send(result);
     });
 
+    // get admin 
     app.get('/users/admin/:email', verifyToken, async (req, res) => {
       const email = req.params.email;
 
@@ -88,6 +93,7 @@ async function run() {
       res.send({ admin });
     })
 
+    // make admin
     app.patch('/users/admin/:id',  async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
@@ -100,6 +106,7 @@ async function run() {
       res.send(result);
     })
 
+    //make instructor
     app.patch('/users/instructor/:id',  async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
@@ -112,7 +119,7 @@ async function run() {
       res.send(result);
     })
 
-    //Class
+    //Class collection 
     app.get('/classes', async(req, res) =>{
       const result = await classCollection.find().toArray();
       res.send(result);
