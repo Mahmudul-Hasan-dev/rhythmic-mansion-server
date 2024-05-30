@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion,ObjectId } = require('mongodb');
 require('dotenv').config()
 const app = express();
 const port = process.env.PORT || 5000;
@@ -57,7 +57,7 @@ async function run() {
 
 
   //Users
-  app.get('/users',   async (req, res) => {
+  app.get('/users', verifyToken,  async (req, res) => {
     const result = await userCollection.find().toArray();
     res.send(result);
   });
@@ -72,12 +72,40 @@ async function run() {
       res.send(result);
     });
 
+    app.get('/users/admin/:email', verifyToken, async (req, res) => {
+      const email = req.params.email;
+
+      if (email !== req.decoded.email) {
+        return res.status(403).send({ message: 'forbidden access' })
+      }
+
+      const query = { email: email };
+      const user = await userCollection.findOne(query);
+      let admin = false;
+      if (user) {
+        admin = user?.role === 'admin';
+      }
+      res.send({ admin });
+    })
+
     app.patch('/users/admin/:id',  async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const updatedDoc = {
         $set: {
           role: 'admin'
+        }
+      }
+      const result = await userCollection.updateOne(filter, updatedDoc);
+      res.send(result);
+    })
+
+    app.patch('/users/instructor/:id',  async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const updatedDoc = {
+        $set: {
+          role: 'instructor'
         }
       }
       const result = await userCollection.updateOne(filter, updatedDoc);
