@@ -44,6 +44,11 @@ async function run() {
     });
 
     //Class
+    app.get('/classes', async(req, res) =>{
+      const result = await classCollection.find().toArray();
+      res.send(result);
+    })
+    
     app.get('/top-classes', async(req, res) =>{
       
       const allClasses = await classCollection.find({}).toArray();
