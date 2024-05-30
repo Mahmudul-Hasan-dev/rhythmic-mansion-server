@@ -5,3 +5,4 @@
 * dotenv
 * express
 * mongoDB
+* jwt
