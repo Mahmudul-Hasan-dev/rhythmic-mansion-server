@@ -31,6 +31,7 @@ async function run() {
     const userCollection = client.db("rhythmicDB").collection("users");
     const classCollection = client.db("rhythmicDB").collection("classes");
     const instructorCollection = client.db("rhythmicDB").collection("instructors");
+    const cartCollection =client.db("rhythmicDB").collection("carts");
 
       // jwt related api
       app.post('/jwt', async (req, res) => {
@@ -106,6 +107,22 @@ async function run() {
       res.send(result);
     })
 
+    app.get('/users/instructor/:email', verifyToken, async (req, res) => {
+      const email = req.params.email;
+
+      if (email !== req.decoded.email) {
+        return res.status(403).send({ message: 'forbidden access' })
+      }
+
+      const query = { email: email };
+      const user = await userCollection.findOne(query);
+      let instructor = false;
+      if (user) {
+        instructor = user?.role === 'instructor';
+      }
+      res.send({ instructor });
+    })
+
     //make instructor
     app.patch('/users/instructor/:id',  async (req, res) => {
       const id = req.params.id;
@@ -138,6 +155,12 @@ async function run() {
   
       res.send(topClasses);
   })
+
+  app.post('/class', verifyToken, async (req, res) => {
+    const item = req.body;
+    const result = await classCollection.insertOne(item);
+    res.send(result);
+  });
   
 //instructors
 app.get('/instructors', async(req, res) =>{
@@ -145,6 +168,24 @@ app.get('/instructors', async(req, res) =>{
   res.send(result);
 })
 
+// select class
+app.get('/carts',verifyToken , async (req, res) => {
+  const email = req.query.email;
+  const decodedEmail = req.decoded.email
+  if(email !== decodedEmail)
+  {
+    return res.status(401).send({ message: 'unauthorized access' })
+  }
+  const query = { email: email };
+  const result = await cartCollection.find(query).toArray();
+  res.send(result);
+});
+
+app.post('/carts', async (req, res) => {
+  const cartItem = req.body;
+  const result = await cartCollection.insertOne(cartItem);
+  res.send(result);
+});
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
