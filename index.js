@@ -136,6 +136,15 @@ async function run() {
       res.send(result);
     })
 
+    app.delete('/users/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await userCollection.deleteOne(query);
+      res.send(result);
+    })
+
+
+
     //Class collection 
     app.get('/classes', async(req, res) =>{
       const result = await classCollection.find().toArray();
@@ -161,6 +170,13 @@ async function run() {
     const result = await classCollection.insertOne(item);
     res.send(result);
   });
+
+  app.delete('/class/:id', async (req, res) => {
+    const id = req.params.id;
+    const query = { _id: new ObjectId(id) }
+    const result = await classCollection.deleteOne(query);
+    res.send(result);
+  })
   
 //instructors
 app.get('/instructors', async(req, res) =>{
@@ -186,6 +202,14 @@ app.post('/carts', async (req, res) => {
   const result = await cartCollection.insertOne(cartItem);
   res.send(result);
 });
+
+app.delete('/carts/:id', async (req, res) => {
+  const id = req.params.id;
+  const query = { _id: new ObjectId(id) }
+  const result = await cartCollection.deleteOne(query);
+  res.send(result);
+})
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
